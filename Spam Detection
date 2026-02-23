@@ -1,0 +1,14 @@
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+import pandas as pd
+df=pd.read_csv("/content/sample_data/spam_ham_dataset.csv",na_values=["NA"],index_col=0)
+df.reset_index(drop=True, inplace=True)
+X_train,X_test,y_train,y_test=train_test_split(df["text"],df["label_num"],test_size=0.3,random_state=34)
+lg=LogisticRegression()
+cv=TfidfVectorizer(stop_words="english");
+txt=cv.fit_transform(X_train)
+pxt=cv.transform(X_test)
+lg.fit(txt,y_train)
+y_pred=lg.predict(pxt)
+print(y_pred)
