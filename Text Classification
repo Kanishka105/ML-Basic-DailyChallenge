@@ -1,0 +1,18 @@
+
+import pandas as pd;
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.model_selection import cross_val_score
+from sklearn.metrics import accuracy_score
+df=pd.read_csv("/content/sample_data/synthetic_text_data (1).csv")
+X_train, X_test, y_train, y_test =train_test_split(df['text'], df['label'], test_size=0.2, random_state=42)
+cv=CountVectorizer(ngram_range=(1,1))
+X_train_cv=cv.fit_transform(X_train)
+model=MultinomialNB()
+model.fit(X_train_cv, y_train)
+X_test_cv=cv.transform(X_test)
+y_pred=model.predict(X_test_cv)
+accuracy=accuracy_score(y_test, y_pred)
+print("Accuracy:", accuracy)
+print(df.info())
