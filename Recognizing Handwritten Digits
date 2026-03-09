@@ -1,0 +1,22 @@
+import pandas as pd
+from sklearn import datasets
+from sklearn.svm import SVC
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+dt = datasets.load_digits()
+X = dt.data
+y = dt.target
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=43
+)
+model = SVC()
+model.fit(X_train, y_train)
+st = model.score(X_test, y_test)
+print("Accuracy:", st)
+px = X[0].reshape(8,8)
+plt.imshow(px, cmap="gray")
+plt.title("Digit: " + str(y[0]))
+plt.axis("off")
+plt.show()
+
+print(X)
