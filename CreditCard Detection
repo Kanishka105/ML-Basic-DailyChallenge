@@ -1,0 +1,28 @@
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import confusion_matrix, accuracy_score
+
+df = pd.read_csv("/content/sample_data/creditcard (1).csv")
+
+df["Time"] = pd.to_datetime(df["Time"], unit="s")
+
+split_index = int(len(df) * 0.8)
+
+train = df[:split_index]
+test = df[split_index:]
+
+X_train = train.drop(["Class","Time"], axis=1)
+y_train = train["Class"]
+
+X_test = test.drop(["Class","Time"], axis=1)
+y_test = test["Class"]
+
+rfc = RandomForestClassifier(n_estimators=100)
+
+rfc.fit(X_train, y_train)
+
+y_pred = rfc.predict(X_test)
+
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print("Confusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
