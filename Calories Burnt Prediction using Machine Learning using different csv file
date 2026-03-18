@@ -1,0 +1,29 @@
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import LabelEncoder
+from xgboost import XGBRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error , r2_score
+calDf = pd.read_csv("/content/sample_data/calories.csv")
+exeDf = pd.read_csv("/content/sample_data/exercise.csv")
+mgDf = pd.merge(calDf,exeDf,on="User_ID")
+mgDf.drop("User_ID",axis=1,inplace=True)
+print(mgDf.head())
+label=LabelEncoder()
+mgDf["Gender"]=label.fit_transform(mgDf["Gender"])
+X=mgDf.drop("Calories",axis=1)
+y=mgDf["Calories"]
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state = 43)
+model=XGBRegressor()
+model.fit(X_train,y_train)
+pred=model.predict(X_test)
+print(model.score(X_train, y_train))
+print(model.score(X_test, y_test))
+mse = mean_squared_error(y_test, pred)
+rmse = np.sqrt(mse)
+
+r2 = r2_score(y_test, pred)
+print(X_train.shape, X_test.shape)
+print("RMSE:", rmse)
+print("R2 Score:", r2)
