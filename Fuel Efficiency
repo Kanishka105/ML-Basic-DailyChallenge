@@ -1,0 +1,55 @@
+import pandas as pd
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error , r2_score
+import numpy as np
+import seaborn as sns
+
+from sklearn.model_selection import cross_val_score
+
+
+
+df = pd.read_csv("/content/sample_data/auto-mpg.csv")
+df["horsepower"] = pd.to_numeric(df["horsepower"], errors="coerce")
+df["horsepower"].fillna(df["horsepower"].median(), inplace=True)
+df["power_to_weight"] = df["horsepower"] / df["weight"]
+df["engine_efficiency"] = df["displacement"] / df["cylinders"]
+df = pd.get_dummies(df, columns=["origin"], drop_first=True)
+
+X = df.drop(["mpg","car name","origin_2","origin_3","acceleration"], axis=1)
+Y = df["mpg"]
+X_train, X_test, Y_train, Y_test = train_test_split(
+    X, Y, test_size=0.2, random_state=43
+)
+
+
+model = RandomForestRegressor(
+    n_estimators=500,
+    max_depth=15,
+    min_samples_split=4,
+    min_samples_leaf=1,
+    max_features="sqrt",
+    random_state=42,
+    n_jobs=-1
+)
+
+model.fit(X_train, Y_train)
+importance = model.feature_importances_
+features = X.columns
+imp_df = pd.DataFrame({
+    "feature": features,
+    "importance": importance
+}).sort_values(by="importance", ascending=False)
+print(imp_df)
+
+
+pred = model.predict(X_test)
+
+mse = mean_squared_error(Y_test, pred)
+rmse = np.sqrt(mse)
+r2 = r2_score(Y_test, pred)
+scores = cross_val_score(model, X, Y, cv=5, scoring='r2')
+print(scores.mean())
+print("🔥 IMPROVED RESULT")
+print("R2:", r2)
+print("RMSE:", rmse)
